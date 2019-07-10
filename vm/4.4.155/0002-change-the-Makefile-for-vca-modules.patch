@@ -1,0 +1,60 @@
+From 93a9024698e35ccf6eb16de0b2c2116d2d329b95 Mon Sep 17 00:00:00 2001
+From: Zhang Owen <owen.zhang@intel.com>
+Date: Wed, 10 Jul 2019 14:57:20 +0800
+Subject: [PATCH 2/5] change the Makefile for vca modules
+
+Change-Id: Ibdc14919845f6896e4cadb3feea9f99f5eb4abb3
+---
+ Makefile | 26 ++++++++++++++++++++++----
+ 1 file changed, 22 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 404383a..be82ed5 100644
+--- a/Makefile
++++ b/Makefile
+@@ -4,6 +4,24 @@ SUBLEVEL = 155
+ EXTRAVERSION =
+ NAME = Blurry Fish Butt
+ 
++ifndef RPMVERSION
++       RPMVERSION=0.0.0
++endif
++
++ifndef PKGVERSION
++       PKGVERSION=0.0.0
++endif
++
++ifndef OS
++       OS=CENTOS
++endif
++
++ifeq ($(OS), UBUNTU)
++       EXTRAVERSION = -1.$(PKGVERSION).vca
++else
++       EXTRAVERSION = -1.$(RPMVERSION).VCA
++endif
++
+ # *DOCUMENTATION*
+ # To see a list of typical targets execute "make help"
+ # More info can be located in ./README
+@@ -365,13 +383,13 @@ CHECK		= sparse
+ 
+ CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
+ 		  -Wbitwise -Wno-return-void $(CF)
+-CFLAGS_MODULE   =
++CFLAGS_MODULE   = -fstack-protector -O2 -D_FORTIFY_SOURCE=2 -Wformat
+ AFLAGS_MODULE   =
+-LDFLAGS_MODULE  =
+-CFLAGS_KERNEL	=
++LDFLAGS_MODULE  = -z noexecstack -z relro -z now
++CFLAGS_KERNEL  = -D_FORTIFY_SOURCE=2 -Wformat
+ AFLAGS_KERNEL	=
+ CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage -fno-tree-loop-im
+-
++LDFLAGS_vmlinux = -z noexecstack -z relro -z now
+ # Prefer linux-backports-modules
+ ifneq ($(KBUILD_SRC),)
+ ifneq ($(shell if test -e $(KBUILD_OUTPUT)/ubuntu-build; then echo yes; fi),yes)
+-- 
+1.8.3.1
+

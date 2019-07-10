@@ -1,0 +1,41 @@
+From 8c2f563ac6be6a5463f256481a3f19cb41714c10 Mon Sep 17 00:00:00 2001
+From: "Zhao, Ping" <ping.zhao@intel.com>
+Date: Fri, 22 Mar 2019 18:27:40 +0800
+Subject: [PATCH 23/27] Update config for kernel 4.19.0
+
+Change-Id: I891d335da656ace985011295d9a0d9314ede6410
+---
+ .config | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/.config b/.config
+index c8c3a80..1cd98fb 100644
+--- a/.config
++++ b/.config
+@@ -1,6 +1,6 @@
+ #
+ # Automatically generated file; DO NOT EDIT.
+-# Linux/x86 4.19.13-1.0.0.0.vca Kernel Configuration
++# Linux/x86 4.19.0-1.0.0.0.vca Kernel Configuration
+ #
+ 
+ #
+@@ -93,7 +93,6 @@ CONFIG_PREEMPT_VOLUNTARY=y
+ CONFIG_VIRT_CPU_ACCOUNTING=y
+ CONFIG_VIRT_CPU_ACCOUNTING_GEN=y
+ # CONFIG_IRQ_TIME_ACCOUNTING is not set
+-CONFIG_HAVE_SCHED_AVG_IRQ=y
+ CONFIG_BSD_PROCESS_ACCT=y
+ CONFIG_BSD_PROCESS_ACCT_V3=y
+ CONFIG_TASKSTATS=y
+@@ -6158,6 +6157,7 @@ CONFIG_CRYPTO_SERPENT_SSE2_X86_64=m
+ CONFIG_CRYPTO_SERPENT_AVX_X86_64=m
+ CONFIG_CRYPTO_SERPENT_AVX2_X86_64=m
+ # CONFIG_CRYPTO_SM4 is not set
++# CONFIG_CRYPTO_SPECK is not set
+ CONFIG_CRYPTO_TEA=m
+ CONFIG_CRYPTO_TWOFISH=m
+ CONFIG_CRYPTO_TWOFISH_COMMON=m
+-- 
+1.8.3.1
+

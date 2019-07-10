@@ -1,0 +1,39 @@
+From 85dbe30ea76b3ccaf0e327f5e1a2728c3174702c Mon Sep 17 00:00:00 2001
+From: Bartosz <bartoszx.niemczewski@intel.com>
+Date: Tue, 24 Oct 2017 10:47:27 -0400
+Subject: [PATCH 14/27] Enable GVT in .config
+
+Signed-off-by: Bartosz <bartoszx.niemczewski@intel.com>
+Signed-off-by: Bartosz Niemczewski <bartoszx.niemczewski@intel.com>
+---
+ .config | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/.config b/.config
+index 35d7cdc..3c17eed 100644
+--- a/.config
++++ b/.config
+@@ -4095,7 +4095,9 @@ CONFIG_DRM_I915=m
+ CONFIG_DRM_I915_CAPTURE_ERROR=y
+ CONFIG_DRM_I915_COMPRESS_ERROR=y
+ CONFIG_DRM_I915_USERPTR=y
+-# CONFIG_DRM_I915_GVT is not set
++CONFIG_DRM_I915_GVT=y
++CONFIG_DRM_I915_GVT_KVMGT=y
++CONFIG_DRM_I915_GVT_XENGT=y
+ # CONFIG_DRM_VGEM is not set
+ CONFIG_DRM_VMWGFX=m
+ CONFIG_DRM_VMWGFX_FBCON=y
+@@ -5025,7 +5027,8 @@ CONFIG_VFIO_PCI_VGA=y
+ CONFIG_VFIO_PCI_MMAP=y
+ CONFIG_VFIO_PCI_INTX=y
+ CONFIG_VFIO_PCI_IGD=y
+-# CONFIG_VFIO_MDEV is not set
++CONFIG_VFIO_MDEV=y
++CONFIG_VFIO_MDEV_DEVICE=y
+ CONFIG_IRQ_BYPASS_MANAGER=m
+ # CONFIG_VIRT_DRIVERS is not set
+ CONFIG_VIRTIO=m
+-- 
+1.8.3.1
+

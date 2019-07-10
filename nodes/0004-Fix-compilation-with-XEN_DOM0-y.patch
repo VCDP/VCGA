@@ -1,0 +1,47 @@
+From 2b21b1d42b4ac6b0f86688ba047c2bad74f66bbc Mon Sep 17 00:00:00 2001
+From: Adam Rutkowski <adam.j.rutkowski@intel.com>
+Date: Thu, 27 Nov 2014 15:47:16 +0100
+Subject: [PATCH 04/27] Fix compilation with XEN_DOM0=y
+
+Remove references to undefined symbols:
+- MAX_INDIRECT_SEGMENTS
+- MAX_INDIRECT_PAGES
+
+Signed-off-by: Adam Rutkowski <adam.j.rutkowski@intel.com>
+Signed-off-by: Bartosz <bartoszx.niemczewski@intel.com>
+Signed-off-by: Bartosz Niemczewski <bartoszx.niemczewski@intel.com>
+---
+ drivers/block/xen-blkback/xenbus.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
+index a4bc74e..0dde91a 100644
+--- a/drivers/block/xen-blkback/xenbus.c
++++ b/drivers/block/xen-blkback/xenbus.c
+@@ -170,7 +170,7 @@ static struct xen_blkif *xen_blkif_alloc(domid_t domid)
+ {
+ 	struct xen_blkif *blkif;
+ 
+-	BUILD_BUG_ON(MAX_INDIRECT_PAGES > BLKIF_MAX_INDIRECT_PAGES_PER_REQUEST);
++	/* BUILD_BUG_ON(MAX_INDIRECT_PAGES > BLKIF_MAX_INDIRECT_PAGES_PER_REQUEST); */
+ 
+ 	blkif = kmem_cache_zalloc(xen_blkif_cachep, GFP_KERNEL);
+ 	if (!blkif)
+@@ -862,12 +862,14 @@ static void connect(struct backend_info *be)
+ 
+ 	xen_blkbk_barrier(xbt, be, be->blkif->vbd.flush_support);
+ 
++	/*
+ 	err = xenbus_printf(xbt, dev->nodename, "feature-persistent", "%u", 1);
+ 	if (err) {
+ 		xenbus_dev_fatal(dev, err, "writing %s/feature-persistent",
+ 				 dev->nodename);
+ 		goto abort;
+ 	}
++	*/
+ 
+ 	err = xenbus_printf(xbt, dev->nodename, "sectors", "%llu",
+ 			    (unsigned long long)vbd_sz(&be->blkif->vbd));
+-- 
+1.8.3.1
+

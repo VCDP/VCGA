@@ -1,0 +1,38 @@
+From ff17432d5319c0836178bd667ca26a0cf6ba9fcc Mon Sep 17 00:00:00 2001
+From: Owen Zhang <owen.zhang@intel.com>
+Date: Tue, 19 Mar 2019 10:18:46 +0800
+Subject: [PATCH 03/27] change the io_schedule_timeout to schedule_timeout
+
+this will fix the CPU iowait usage high issue.
+
+Change-Id: I4b1851d354de52f116273b630c181377f00cb35d
+Signed-off-by: Owen Zhang <owen.zhang@intel.com>
+---
+ drivers/gpu/drm/i915/i915_request.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/gpu/drm/i915/i915_request.c b/drivers/gpu/drm/i915/i915_request.c
+index 5c2c93c..21950c1 100644
+--- a/drivers/gpu/drm/i915/i915_request.c
++++ b/drivers/gpu/drm/i915/i915_request.c
+@@ -1330,7 +1330,7 @@ long i915_request_wait(struct i915_request *rq,
+ 			goto complete;
+ 		}
+ 
+-		timeout = io_schedule_timeout(timeout);
++		timeout = schedule_timeout(timeout);
+ 	} while (1);
+ 
+ 	GEM_BUG_ON(!intel_wait_has_seqno(&wait));
+@@ -1363,7 +1363,7 @@ long i915_request_wait(struct i915_request *rq,
+ 			break;
+ 		}
+ 
+-		timeout = io_schedule_timeout(timeout);
++		timeout = schedule_timeout(timeout);
+ 
+ 		if (intel_wait_complete(&wait) &&
+ 		    intel_wait_check_request(&wait, rq))
+-- 
+1.8.3.1
+

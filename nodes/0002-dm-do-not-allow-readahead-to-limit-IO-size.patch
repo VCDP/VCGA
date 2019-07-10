@@ -1,0 +1,42 @@
+From a641a0e8b087b7f6219f713848b77c4ac19fc8d9 Mon Sep 17 00:00:00 2001
+From: Owen Zhang <owen.zhang@intel.com>
+Date: Tue, 19 Mar 2019 10:12:34 +0800
+Subject: [PATCH 02/27] dm: do not allow readahead to limit IO size
+
+commit c6d6e9b0f6b4201c77f2cea3964dd122697e3543 upstream.
+
+Update DM to set the bdi's io_pages.  This fixes reads to be capped at
+the device's max request size (even if user's read IO exceeds the
+established readahead setting).
+
+v4.19
+	backported to kernel 4.19 (Owen Zhang).
+
+Change-Id: I6aa7adf566862562e74b1f6f26f92e0c92106c5f
+Fixes: 9491ae4a ("mm: don't cap request size based on read-ahead setting")
+Cc: stable@vger.kernel.org
+Reviewed-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Jaegeuk Kim <jaegeuk@kernel.org>
+Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/md/dm-table.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+index 3d0e2c1..3aa1ea4 100644
+--- a/drivers/md/dm-table.c
++++ b/drivers/md/dm-table.c
+@@ -1937,6 +1937,9 @@ void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
+ 	 */
+ 	if (blk_queue_add_random(q) && dm_table_all_devices_attribute(t, device_is_not_random))
+ 		blk_queue_flag_clear(QUEUE_FLAG_ADD_RANDOM, q);
++ 
++        /* Allow reads to exceed readahead limits */
++        q->backing_dev_info->io_pages = limits->max_sectors >> (PAGE_SHIFT - 9);
+ }
+ 
+ unsigned int dm_table_get_num_targets(struct dm_table *t)
+-- 
+1.8.3.1
+

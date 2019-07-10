@@ -1,0 +1,30 @@
+From 71c1a1f16feafafb701f18cb4ab0c5c2e1ccf5fd Mon Sep 17 00:00:00 2001
+From: "Zhang, Owen" <owen.zhang@intel.com>
+Date: Mon, 1 Jul 2019 11:42:06 +0800
+Subject: [PATCH 27/27] [drm/i915] Change the GEN9_LP check to GEN9 when
+ disable RC6
+
+this is only for VCXA platform.
+
+Change-Id: I28b204c1484491ae9b31c71b9d03e994a983760f
+Signed-off-by: Zhang, Owen <owen.zhang@intel.com>
+---
+ drivers/gpu/drm/i915/intel_pm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/gpu/drm/i915/intel_pm.c b/drivers/gpu/drm/i915/intel_pm.c
+index 43ae9de..c4f4ff1 100644
+--- a/drivers/gpu/drm/i915/intel_pm.c
++++ b/drivers/gpu/drm/i915/intel_pm.c
+@@ -6740,7 +6740,7 @@ static bool sanitize_rc6(struct drm_i915_private *i915)
+ 		info->has_rc6 = 0;
+ 
+ 	if (info->has_rc6 &&
+-	    IS_GEN9_LP(i915) && !bxt_check_bios_rc6_setup(i915)) {
++	    IS_GEN9(i915) && !bxt_check_bios_rc6_setup(i915)) {
+ 		DRM_INFO("RC6 disabled by BIOS\n");
+ 		info->has_rc6 = 0;
+ 	}
+-- 
+1.8.3.1
+

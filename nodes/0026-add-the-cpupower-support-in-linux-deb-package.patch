@@ -1,0 +1,71 @@
+From 47da4f8510123f62ad434f69438903e80e5d4652 Mon Sep 17 00:00:00 2001
+From: "Zhang, Owen" <owen.zhang@intel.com>
+Date: Wed, 26 Jun 2019 16:43:01 +0800
+Subject: [PATCH 26/27] add the cpupower support in linux deb package.
+
+Change-Id: I378eda916fa289ae7e6e295861412e61f313d4f7
+Signed-off-by: Zhang, Owen <owen.zhang@intel.com>
+---
+ scripts/package/builddeb | 30 +++++++++++++++++++++++++++++-
+ 1 file changed, 29 insertions(+), 1 deletion(-)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 90c9a8a..61dca42 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -39,10 +39,12 @@ tmpdir="$objtree/debian/tmp"
+ kernel_headers_dir="$objtree/debian/hdrtmp"
+ libc_headers_dir="$objtree/debian/headertmp"
+ dbg_dir="$objtree/debian/dbgtmp"
++tools_dir="$objtree/debian/toolstmp"
+ packagename=linux-image-$version
+ kernel_headers_packagename=linux-headers-$version
+ libc_headers_packagename=linux-libc-dev
+ dbg_packagename=$packagename-dbg
++tools_packagename=linux-cpupower-$version
+ 
+ if [ "$ARCH" = "um" ] ; then
+ 	packagename=user-mode-linux-$version
+@@ -65,7 +67,7 @@ esac
+ BUILD_DEBUG="$(grep -s '^CONFIG_DEBUG_INFO=y' $KCONFIG_CONFIG || true)"
+ 
+ # Setup the directory structure
+-rm -rf "$tmpdir" "$kernel_headers_dir" "$libc_headers_dir" "$dbg_dir" $objtree/debian/files
++rm -rf "$tmpdir" "$kernel_headers_dir" "$libc_headers_dir" "$dbg_dir" "$tools_dir" $objtree/debian/files
+ mkdir -m 755 -p "$tmpdir/DEBIAN"
+ mkdir -p "$tmpdir/lib" "$tmpdir/boot"
+ mkdir -p "$kernel_headers_dir/lib/modules/$version/"
+@@ -194,4 +196,30 @@ if [ -n "$BUILD_DEBUG" ] ; then
+ 	create_package "$dbg_packagename" "$dbg_dir"
+ fi
+ 
++if [ -n "$BUILD_TOOLS" ]
++then
++	# HACK - change output dir from relative to absolute
++	mkdir -p $tools_dir
++	tools_dest=`readlink -f $tools_dir`
++	if [ -n "$O" ]
++	then
++		output=`readlink -f $objtree`
++		mkdir -p $output/tools/power/cpupower
++		output="O=$output/tools/power/cpupower"
++	fi
++	$MAKE -C $srctree/tools/power/cpupower $output LDFLAGS= srctree=$KBUILD_SRC DESTDIR=$tools_dest install
++	cat <<EOF >> debian/control
++
++Package: $tools_packagename
++Architecture: any
++Replaces: linux-base, linux-tools-common
++Depends: \${shlibs:Depends}
++Description: CPU power management tools Linux $version
++ This package contains the CPU power management tools for Linux
++ kernel version $version .
++EOF
++	dpkg-shlibdeps $tools_dest/usr/bin/* $tools_dest/usr/lib64/*
++	create_package "$tools_packagename" "$tools_dir"
++fi
++
+ exit 0
+-- 
+1.8.3.1
+

@@ -1,0 +1,33 @@
+From 51ecc785e95cfb4f6bc26aa88caecda994f16b12 Mon Sep 17 00:00:00 2001
+From: Adam Rutkowski <adam.j.rutkowski@intel.com>
+Date: Wed, 16 Mar 2016 11:00:37 +0100
+Subject: [PATCH 09/27] Apply VCA IOMMU workaround to host NTB devices
+
+This is required so that workaround for requester ID translation
+is effective on host.
+
+Signed-off-by: Adam Rutkowski <adam.j.rutkowski@intel.com>
+Signed-off-by: Bartosz Niemczewski <bartoszx.niemczewski@intel.com>
+Signed-off-by: Bartosz <bartoszx.niemczewski@intel.com>
+Signed-off-by: Bartosz Niemczewski <bartoszx.niemczewski@intel.com>
+---
+ drivers/pci/quirks.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/pci/quirks.c b/drivers/pci/quirks.c
+index c51be78..fbdb314 100644
+--- a/drivers/pci/quirks.c
++++ b/drivers/pci/quirks.c
+@@ -4245,6 +4245,9 @@ static void quirk_plx_vca(struct pci_dev *dev)
+        dev->is_ntb=1;
+ }
+ 
++DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_INTEL, 0x2954, quirk_plx_vca);
++DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_INTEL, 0x2955, quirk_plx_vca);
++DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_INTEL, 0x2956, quirk_plx_vca);
+ DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_INTEL, 0x2958, quirk_plx_vca);
+ DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_INTEL, 0x2959, quirk_plx_vca);
+ DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_INTEL, 0x295A, quirk_plx_vca);
+-- 
+1.8.3.1
+

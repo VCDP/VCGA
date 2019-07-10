@@ -1,0 +1,28 @@
+From 5be1bde3509f46d71f24b9baa9aadfc55302378e Mon Sep 17 00:00:00 2001
+From: "Zhao, Ping" <ping.zhao@intel.com>
+Date: Tue, 26 Mar 2019 17:07:12 +0800
+Subject: [PATCH 24/27] Add back ACCESS_ONCE define for driver compile
+
+Change-Id: I02aae28aafa25fef594d1e34ef652a8d5bc5c7b0
+---
+ include/linux/compiler.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/include/linux/compiler.h b/include/linux/compiler.h
+index 681d866..f3e05ff 100644
+--- a/include/linux/compiler.h
++++ b/include/linux/compiler.h
+@@ -361,4 +361,10 @@ static inline void *offset_to_ptr(const int *off)
+ 	compiletime_assert(__native_word(t),				\
+ 		"Need native word sized stores/loads for atomicity.")
+ 
++
++#define __ACCESS_ONCE(x) ({ \
++        __maybe_unused typeof(x) __var = (__force typeof(x)) 0; \
++       (volatile typeof(x) *)&(x); })
++#define ACCESS_ONCE(x) (*__ACCESS_ONCE(x))
++
+ #endif /* __LINUX_COMPILER_H */
+-- 
+1.8.3.1
+

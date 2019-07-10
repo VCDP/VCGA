@@ -1,0 +1,58 @@
+From a2fa071440437670dfd0fae845e8c0264535a9a3 Mon Sep 17 00:00:00 2001
+From: Marcin Rysztowski <marcin.rysztowski@intel.com>
+Date: Fri, 7 Oct 2016 13:09:25 +0200
+Subject: [PATCH 10/27] vmlinux*.bz2 file moved to separeate kernel-debug
+ package
+
+vmlinux*.bz2 file, containing unstripped vmlinux file, moved to separate package to limit footprint of image
+
+Signed-off-by: Bartosz Niemczewski <bartoszx.niemczewski@intel.com>
+Signed-off-by: Bartosz <bartoszx.niemczewski@intel.com>
+Signed-off-by: Bartosz Niemczewski <bartoszx.niemczewski@intel.com>
+---
+ scripts/package/mkspec | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
+
+diff --git a/scripts/package/mkspec b/scripts/package/mkspec
+index e05646d..098a25b 100755
+--- a/scripts/package/mkspec
++++ b/scripts/package/mkspec
+@@ -74,6 +74,14 @@ $S$M	%description -n kernel-devel
+ $S$M	This package provides kernel headers and makefiles sufficient to build modules
+ $S$M	against the $__KERNELRELEASE kernel package.
+ $S$M
++$S$M	%package debug
++$S$M	Summary: Debug package with unstripped $__KERNELRELEASE kernel
++$S$M 	Group: System Environment/Kernel
++$S$M	AutoReqProv: no
++$S$M 	%description -n kernel-debug
++$S$M	This package provides unstripped $__KERNELRELEASE kernel
++$S$M	
++
+ $S	%prep
+ $S	%setup -q
+ $S
+@@ -132,12 +140,19 @@ $S$M	ln -sf /usr/src/kernels/$KERNELRELEASE source
+ $M	/lib/modules/$KERNELRELEASE
+ $M	%exclude /lib/modules/$KERNELRELEASE/build
+ $M	%exclude /lib/modules/$KERNELRELEASE/source
+-	/boot/*
++	/boot/config*
++	/boot/System.map*
++	/boot/vmlinuz*
+ 
+ 	%files headers
+ 	%defattr (-, root, root)
+ 	/usr/include
+ $S$M
++$S$M	%files debug
++$S$M	%defattr (-, root, root)
++$S$M	/boot/vmlinux*bz2
++$S$M
++
+ $S$M	%files devel
+ $S$M	%defattr (-, root, root)
+ $S$M	/usr/src/kernels/$KERNELRELEASE
+-- 
+1.8.3.1
+

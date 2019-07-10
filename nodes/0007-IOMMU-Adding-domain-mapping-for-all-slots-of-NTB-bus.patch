@@ -1,0 +1,122 @@
+From 78bec16cbb20355b7a38cf8e63ad757383e98d71 Mon Sep 17 00:00:00 2001
+From: Michal Kulikowski <michal.kulikowski@intel.com>
+Date: Fri, 31 Jul 2015 15:04:48 +0200
+Subject: [PATCH 07/27] IOMMU: Adding domain mapping for all slots of NTB bus
+
+Non-transparent bridge performs requester ID translation on
+packets travelling across the bridge. Resulting requester ID
+consists of:
+- bus ID equal to NTB bus ID in the target domain
+- device ID (slot) set to index of associated entry in requester
+  ID translation table of NTB
+- function ID equal to original requester ID function ID
+
+Need to program IOMMU to accept transactions from any SLOT
+and any function id in range [0,4] on the bus where NTB resides
+
+Signed-off-by: Michal Kulikowski <michal.kulikowski@intel.com>
+Signed-off-by: Adam Rutkowski <adam.j.rutkowski@intel.com>
+Signed-off-by: Bartosz Niemczewski <bartoszx.niemczewski@intel.com>
+Signed-off-by: Bartosz <bartoszx.niemczewski@intel.com>
+Signed-off-by: Bartosz Niemczewski <bartoszx.niemczewski@intel.com>
+---
+ drivers/iommu/intel-iommu.c | 38 ++++++++++++++++++++++++++++++++++++--
+ drivers/pci/quirks.c        | 13 +++++++++++++
+ include/linux/pci.h         |  1 +
+ 3 files changed, 50 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/iommu/intel-iommu.c b/drivers/iommu/intel-iommu.c
+index bedc801..bc7d5b1 100644
+--- a/drivers/iommu/intel-iommu.c
++++ b/drivers/iommu/intel-iommu.c
+@@ -2124,6 +2124,36 @@ static int domain_context_mapping_one(struct dmar_domain *domain,
+ 	return ret;
+ }
+ 
++static int add_ntb_mapping(
++       struct dmar_domain *domain,
++       struct intel_iommu *iommu,
++       u8 bus,
++       const struct pci_dev *pdev)
++{
++       unsigned int slot, func;
++       int ret;
++       const unsigned num_pci_slots = 0x20;
++       const unsigned num_pci_funcs = 0x8;
++
++       for (slot = 0; slot < num_pci_slots; slot++) {
++               for (func = 0; func < num_pci_funcs; func++) {
++                       if ((ret = domain_context_mapping_one(domain, iommu, bus,
++                                       PCI_DEVFN(slot, func)))) {
++                               pr_err("IOMMU-NTB: error mapping domains for "
++                                       "NTB [bus: 0x%x devfn: 0x%x]: %x\n",
++                                       bus,  (unsigned)PCI_DEVFN(slot, func),
++                                       ret);
++                               return ret;
++                       }
++                       pr_debug("IOMMU-NTB: mapping domains for NTB "
++                                "[bus: 0x%x devfn: 0x%x]\n", bus,
++                                (unsigned)PCI_DEVFN(slot, func));
++               }
++       }
++
++       return ret;
++}
++
+ struct domain_context_mapping_data {
+ 	struct dmar_domain *domain;
+ 	struct intel_iommu *iommu;
+@@ -2134,8 +2164,12 @@ static int domain_context_mapping_cb(struct pci_dev *pdev,
+ {
+ 	struct domain_context_mapping_data *data = opaque;
+ 
+-	return domain_context_mapping_one(data->domain, data->iommu,
+-					  PCI_BUS_NUM(alias), alias & 0xff);
++        if (!pdev->is_ntb)
++                return domain_context_mapping_one(data->domain, data->iommu,
++                                          PCI_BUS_NUM(alias), alias & 0xff);
++        else
++                return add_ntb_mapping(data->domain, data->iommu,
++                                          PCI_BUS_NUM(alias), pdev);
+ }
+ 
+ static int
+diff --git a/drivers/pci/quirks.c b/drivers/pci/quirks.c
+index 6bc27b7..c51be78 100644
+--- a/drivers/pci/quirks.c
++++ b/drivers/pci/quirks.c
+@@ -4237,6 +4237,19 @@ static int pci_quirk_xgene_acs(struct pci_dev *dev, u16 acs_flags)
+ }
+ 
+ /*
++ * VCA accelerator uses non-transparent bridge, need to handle requester ID
++ * translation for PCI transactions.
++ */
++static void quirk_plx_vca(struct pci_dev *dev)
++{
++       dev->is_ntb=1;
++}
++
++DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_INTEL, 0x2958, quirk_plx_vca);
++DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_INTEL, 0x2959, quirk_plx_vca);
++DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_INTEL, 0x295A, quirk_plx_vca);
++
++/*
+  * Many Intel PCH root ports do provide ACS-like features to disable peer
+  * transactions and validate bus numbers in requests, but do not provide an
+  * actual PCIe ACS capability.  This is the list of device IDs known to fall
+diff --git a/include/linux/pci.h b/include/linux/pci.h
+index 6925828..882a54c 100644
+--- a/include/linux/pci.h
++++ b/include/linux/pci.h
+@@ -310,6 +310,7 @@ struct pci_dev {
+ 	u8		pcie_mpss:3;	/* PCIe Max Payload Size Supported */
+ 	u8		rom_base_reg;	/* Config register controlling ROM */
+ 	u8		pin;		/* Interrupt pin this device uses */
++	u8              is_ntb;         /* is this a non-transparent bridge device? */
+ 	u16		pcie_flags_reg;	/* Cached PCIe Capabilities Register */
+ 	unsigned long	*dma_alias_mask;/* Mask of enabled devfn aliases */
+ 
+-- 
+1.8.3.1
+

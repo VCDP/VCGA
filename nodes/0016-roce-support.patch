@@ -1,0 +1,34 @@
+From af3e121751ef0166c0acfbc1e2a0e6892cdca0ec Mon Sep 17 00:00:00 2001
+From: Piotr Cybulski <piotrx.cybulski@intel.com>
+Date: Mon, 27 Nov 2017 12:28:08 +0100
+Subject: [PATCH 16/27] roce support
+
+Signed-off-by: Bartosz Niemczewski <bartoszx.niemczewski@intel.com>
+---
+ .config | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/.config b/.config
+index 3c17eed..b4cdb86 100644
+--- a/.config
++++ b/.config
+@@ -1,6 +1,6 @@
+ #
+ # Automatically generated file; DO NOT EDIT.
+-# Linux/x86 4.10.0-1.0.0.0.VCA Kernel Configuration
++# Linux/x86 4.10.0-1.2.1.roce.vca Kernel Configuration
+ #
+ CONFIG_64BIT=y
+ CONFIG_X86_64=y
+@@ -4858,7 +4858,7 @@ CONFIG_INFINIBAND_SRPT=m
+ CONFIG_INFINIBAND_ISER=m
+ CONFIG_INFINIBAND_ISERT=m
+ # CONFIG_INFINIBAND_RDMAVT is not set
+-# CONFIG_RDMA_RXE is not set
++CONFIG_RDMA_RXE=m
+ CONFIG_EDAC_ATOMIC_SCRUB=y
+ CONFIG_EDAC_SUPPORT=y
+ CONFIG_EDAC=y
+-- 
+1.8.3.1
+

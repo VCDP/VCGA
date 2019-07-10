@@ -1,0 +1,44 @@
+From c1086c76c1964ca2a5d94987955d9e5ead0f1360 Mon Sep 17 00:00:00 2001
+From: Bartosz <bartoszx.niemczewski@intel.com>
+Date: Tue, 24 Oct 2017 09:51:53 -0400
+Subject: [PATCH 13/27] Add pkg version to kernel name
+
+Signed-off-by: Bartosz <bartoszx.niemczewski@intel.com>
+Signed-off-by: Bartosz Niemczewski <bartoszx.niemczewski@intel.com>
+---
+ Makefile | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index 80b4c38..effe5a3 100644
+--- a/Makefile
++++ b/Makefile
+@@ -5,6 +5,25 @@ SUBLEVEL = 0
+ EXTRAVERSION =
+ NAME = "People's Front"
+ 
++ifndef RPMVERSION
++        RPMVERSION=0.0.0
++endif
++
++ifndef PKGVERSION
++        PKGVERSION=0.0.0
++endif
++
++ifndef OS
++        OS=CENTOS
++endif
++
++ifeq ($(OS), UBUNTU)
++        EXTRAVERSION = -1.$(PKGVERSION).vca
++else
++        EXTRAVERSION = -1.$(RPMVERSION).VCA
++endif
++
++
+ # *DOCUMENTATION*
+ # To see a list of typical targets execute "make help"
+ # More info can be located in ./README
+-- 
+1.8.3.1
+

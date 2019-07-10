@@ -1,0 +1,40 @@
+From 292ede5a239b4ce2d8634a40f7e83b6fed5eb2be Mon Sep 17 00:00:00 2001
+From: Karol Maslowski <karol.maslowski@intel.com>
+Date: Tue, 7 Nov 2017 05:16:54 -0500
+Subject: [PATCH 15/27] MTU can be larger than 1500.
+
+This little change is "taken" from kernel 4.4. There is the same code and it's working on our network model (over PCIe).
+
+Signed-off-by: Karol Maslowski <karol.maslowski@intel.com>
+Signed-off-by: Bartosz Niemczewski <bartoszx.niemczewski@intel.com>
+---
+ net/core/dev.c | 13 +++----------
+ 1 file changed, 3 insertions(+), 10 deletions(-)
+
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 93243479..8e412bf 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -7573,16 +7573,9 @@ int dev_set_mtu_ext(struct net_device *dev, int new_mtu,
+ 	if (new_mtu == dev->mtu)
+ 		return 0;
+ 
+-	/* MTU must be positive, and in range */
+-	if (new_mtu < 0 || new_mtu < dev->min_mtu) {
+-		NL_SET_ERR_MSG(extack, "mtu less than device minimum");
+-		return -EINVAL;
+-	}
+-
+-	if (dev->max_mtu > 0 && new_mtu > dev->max_mtu) {
+-		NL_SET_ERR_MSG(extack, "mtu greater than device maximum");
+-		return -EINVAL;
+-	}
++        /* MTU must be positive */
++        if (new_mtu < 0)
++                return -EINVAL;
+ 
+ 	if (!netif_device_present(dev))
+ 		return -ENODEV;
+-- 
+1.8.3.1
+
